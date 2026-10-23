@@ -1,0 +1,118 @@
+erDiagram
+    PACIENTE ||--o{ CONSULTA : agenda
+    PROFISSIONAL ||--o{ CONSULTA : atende
+    SALA ||--o{ CONSULTA : recebe
+    PROFISSIONAL ||--o{ PROFISSIONAL_ESPECIALIDADE : possui
+    ESPECIALIDADE ||--o{ PROFISSIONAL_ESPECIALIDADE : classifica
+    CONSULTA ||--o{ PROCEDIMENTO_CONSULTA : inclui
+    PROCEDIMENTO ||--o{ PROCEDIMENTO_CONSULTA : especifica
+    CONSULTA ||--o| COBRANCA : gera
+    COBRANCA ||--o{ PAGAMENTO : recebe
+    FORNECEDOR ||--o{ ORDEM_COMPRA : recebe
+    ORDEM_COMPRA ||--o{ ITEM_ORDEM_COMPRA : contem
+    MATERIAL ||--o{ ITEM_ORDEM_COMPRA : comprado
+    MATERIAL ||--o{ MOVIMENTACAO_ESTOQUE : movimenta
+    ITEM_ORDEM_COMPRA o|--o{ MOVIMENTACAO_ESTOQUE : origina_entrada
+    CONSULTA o|--o{ MOVIMENTACAO_ESTOQUE : origina_consumo
+
+    PACIENTE {
+        bigint paciente_id PK
+        varchar nome_completo
+        date data_nascimento
+        varchar telefone
+        varchar email
+        boolean ativo
+    }
+    PROFISSIONAL {
+        bigint profissional_id PK
+        varchar nome_completo
+        varchar cro_exemplo UK
+        boolean ativo
+    }
+    ESPECIALIDADE {
+        bigint especialidade_id PK
+        varchar nome UK
+    }
+    PROFISSIONAL_ESPECIALIDADE {
+        bigint profissional_id PK, FK
+        bigint especialidade_id PK, FK
+    }
+    SALA {
+        bigint sala_id PK
+        varchar nome UK
+        boolean ativa
+    }
+    PROCEDIMENTO {
+        bigint procedimento_id PK
+        varchar nome UK
+        integer duracao_minutos
+        numeric preco_referencia
+        boolean ativo
+    }
+    CONSULTA {
+        bigint consulta_id PK
+        bigint paciente_id FK
+        bigint profissional_id FK
+        bigint sala_id FK
+        timestamptz inicio
+        timestamptz fim
+        varchar status
+    }
+    PROCEDIMENTO_CONSULTA {
+        bigint procedimento_consulta_id PK
+        bigint consulta_id FK
+        bigint procedimento_id FK
+        varchar dente_fdi
+        integer quantidade
+        numeric preco_unitario
+    }
+    COBRANCA {
+        bigint cobranca_id PK
+        bigint consulta_id FK, UK
+        date emitida_em
+        varchar status
+    }
+    PAGAMENTO {
+        bigint pagamento_id PK
+        bigint cobranca_id FK
+        timestamptz pago_em
+        numeric valor
+        varchar meio
+        varchar status
+    }
+    FORNECEDOR {
+        bigint fornecedor_id PK
+        varchar codigo UK
+        varchar nome
+        boolean ativo
+    }
+    MATERIAL {
+        bigint material_id PK
+        varchar sku UK
+        varchar nome
+        varchar unidade
+        numeric estoque_minimo
+        boolean ativo
+    }
+    ORDEM_COMPRA {
+        bigint ordem_compra_id PK
+        bigint fornecedor_id FK
+        date solicitada_em
+        varchar status
+    }
+    ITEM_ORDEM_COMPRA {
+        bigint item_ordem_compra_id PK
+        bigint ordem_compra_id FK
+        bigint material_id FK
+        numeric quantidade
+        numeric custo_unitario
+    }
+    MOVIMENTACAO_ESTOQUE {
+        bigint movimentacao_estoque_id PK
+        bigint material_id FK
+        bigint item_ordem_compra_id FK
+        bigint consulta_id FK
+        varchar tipo
+        numeric quantidade
+        timestamptz ocorrida_em
+    }
